@@ -6,6 +6,7 @@ import numpy as np
 import psycopg2
 from sqlalchemy import create_engine
 
+
 def read_data(DB_path):
     engine = create_engine(DB_path)
     connection = engine.connect()
@@ -33,11 +34,14 @@ def getWeatherForecast():
 
     rawForecastData = req.read()
     req.close()
-    return json.loads(rawForecastData)
+    weatherForecast = json.loads(rawForecastData)
+    df = pd.json_normalize(weatherForecast['days'][0])
+    df.insert(loc=0, column='name', value='Olsztyn')
+    df.rename(columns={'pressure': 'sealevelpressure'}, inplace=True)
+    df.drop('datetimeEpoch', inplace=True, axis=1)
+    df.drop('sunriseEpoch', inplace=True, axis=1)
+    df.drop('sunsetEpoch', inplace=True, axis=1)
+    df.drop('source', inplace=True, axis=1)
+    return df
 
-weatherForecast = getWeatherForecast()
-print('Weather forecast for {location}'.format(location=weatherForecast['resolvedAddress']))
-days=weatherForecast['days'];
 
-for day in days:
-    print('{datetime} tempmax:{tempmax} tempmin:{tempmin} description:{description}'.format(datetime=day['datetime'], tempmax=day["tempmax"], tempmin=day["tempmin"], description=day["description"]))
