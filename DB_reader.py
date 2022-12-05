@@ -36,8 +36,11 @@ def getWeatherForecast():
     req.close()
     weatherForecast = json.loads(rawForecastData)
     df = pd.json_normalize(weatherForecast['days'][0])
+    df.insert(loc=0, column='Name', value='Olsztyn')
+    df.drop('datetimeEpoch', inplace=True, axis=1)
+    df.drop('sunriseEpoch', inplace=True, axis=1)
+    df.drop('sunsetEpoch', inplace=True, axis=1)
+    df.drop('source', inplace=True, axis=1)
     return df
-
-
 
 
