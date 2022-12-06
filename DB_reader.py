@@ -6,10 +6,7 @@ import urllib.parse
 import urllib.request
 import json
 import pandas as pd
-import numpy as np
-import psycopg2
 from sqlalchemy import create_engine
-from joblib import dump, load
 
 
 def read_data(DB_path):
