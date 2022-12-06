@@ -22,7 +22,7 @@ def TreeGradientBoosting(X,y):
     return model
 
 
-def LinearRegression(X,y):
+def LinearRegressionModel(X,y):
     model = LinearRegression()
     model.fit(X, y)
     return model
@@ -46,7 +46,7 @@ def RandomForest(X,y):
     return model
 
 
-def LogisticRegression(X,y):
+def LogisticRegressionModel(X,y):
     model = LogisticRegression()
     model.fit(X, y)
     return model

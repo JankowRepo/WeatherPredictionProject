@@ -11,8 +11,8 @@ import importlib
 importlib.reload(db)
 
 def get_data():
-    # df=db.read_data('postgresql+psycopg2://postgres:admin@localhost/postgres')
-    df = db.read_data('postgresql+psycopg2://postgres:adam123@localhost/postgres')
+    df=db.read_data('postgresql+psycopg2://postgres:admin@localhost/postgres')
+    #df = db.read_data('postgresql+psycopg2://postgres:adam123@localhost/postgres')
 
     df = df[["datetime", "temp", "tempmin", "tempmax", "feelslike", "feelslikemax", "feelslikemin",
              'dew', "humidity", "precip", 'preciptype', 'precipcover', 'snowdepth', "windspeed",
@@ -23,6 +23,7 @@ def get_data():
     df.loc[df.preciptype == 'snow', 'preciptype'] = 2
     df.loc[df.preciptype == 'rain,snow', 'preciptype'] = 3
     df.loc[df.preciptype == 'rain,freezingrain', 'preciptype'] = 4
+    df.loc[df.preciptype == 'rain,freezingrain,snow', 'preciptype'] = 5
     df["preciptype"] = pd.to_numeric(df["preciptype"])
 
 
@@ -48,6 +49,7 @@ def get_data():
     df.loc[df.conditions == 'Snow, Overcast', 'conditions'] = 3
     df.loc[df.conditions == 'Snow, Fog', 'conditions'] = 3
     df.loc[df.conditions == 'Snow, Partially cloudy', 'conditions'] = 3
+    df.loc[df.conditions == 'Snow, Rain, Freezing Drizzle/Freezing Rain, Overcast', 'conditions'] = 3
 
 
     df["conditions"] = pd.to_numeric(df["conditions"])
