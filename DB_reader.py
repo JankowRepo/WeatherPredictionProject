@@ -29,7 +29,7 @@ def getWeatherForecast():
         LOCATION)
     requestUrl = requestUrl + "?key=" + API_KEY + "&unitGroup=" + UNIT_GROUP + "&include=days";
 
-    print('Weather requestUrl={requestUrl}'.format(requestUrl=requestUrl))
+    # print('Weather requestUrl={requestUrl}'.format(requestUrl=requestUrl))
 
     try:
         req = urllib.request.urlopen(requestUrl)

@@ -1,5 +1,7 @@
 import warnings
+from pandas.core.common import SettingWithCopyWarning
 warnings.simplefilter(action='ignore', category=FutureWarning)
+warnings.simplefilter(action="ignore", category=SettingWithCopyWarning)
 
 from keras import Sequential, layers
 from keras.layers import Dense, Conv1D, Flatten
@@ -74,8 +76,8 @@ def NeuralNetworks(X,y):
         mode='auto',
         restore_best_weights=True)
 
-    epochs=10
-    batch_size=8
+    epochs=25
+    batch_size=16
 
 
     model = Sequential()
