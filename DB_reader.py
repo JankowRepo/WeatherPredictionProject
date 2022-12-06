@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import psycopg2
 from sqlalchemy import create_engine
+from joblib import dump, load
 
 
 def read_data(DB_path):
@@ -12,6 +13,7 @@ def read_data(DB_path):
     connection = engine.connect()
     df = pd.read_sql("""SELECT * FROM public."DBWeather" """, con=connection)
     return df
+
 
 
 API_KEY = "D83SDPLMVBRWQMWP5QAVLQ9G4"
@@ -51,6 +53,7 @@ def getWeatherForecast():
     df.drop('sunriseEpoch', inplace=True, axis=1)
     df.drop('sunsetEpoch', inplace=True, axis=1)
     df.drop('source', inplace=True, axis=1)
+
     return df
 
 
