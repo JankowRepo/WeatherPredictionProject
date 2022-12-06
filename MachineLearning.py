@@ -1,3 +1,6 @@
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
 from keras import Sequential, layers
 from keras.layers import Dense, Conv1D, Flatten
 from keras.optimizers import SGD
@@ -71,7 +74,7 @@ def NeuralNetworks(X,y):
         mode='auto',
         restore_best_weights=True)
 
-    epochs=100
+    epochs=10
     batch_size=8
 
 
