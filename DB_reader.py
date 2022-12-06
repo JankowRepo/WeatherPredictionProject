@@ -1,4 +1,5 @@
 import warnings
+
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 import urllib.parse
@@ -18,7 +19,6 @@ def read_data(DB_path):
     return df
 
 
-
 API_KEY = "D83SDPLMVBRWQMWP5QAVLQ9G4"
 LOCATION = "Olsztyn,PL"
 UNIT_GROUP = "metric"
@@ -27,6 +27,7 @@ UNIT_GROUP = "metric"
 def getWeatherForecast():
     requestUrl = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/" + urllib.parse.quote_plus(
         LOCATION)
+
     requestUrl = requestUrl + "?key=" + API_KEY + "&unitGroup=" + UNIT_GROUP + "&include=days";
 
     # print('Weather requestUrl={requestUrl}'.format(requestUrl=requestUrl))
@@ -58,5 +59,3 @@ def getWeatherForecast():
     df.drop('source', inplace=True, axis=1)
 
     return df
-
-

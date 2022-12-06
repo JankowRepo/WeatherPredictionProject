@@ -1,5 +1,6 @@
 import warnings
 from pandas.core.common import SettingWithCopyWarning
+
 warnings.simplefilter(action='ignore', category=FutureWarning)
 warnings.simplefilter(action="ignore", category=SettingWithCopyWarning)
 
@@ -16,59 +17,61 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.dummy import DummyClassifier
 from sklearn.svm import SVR
 import tensorflow as tf
 from keras import backend as K
 
 
-def TreeGradientBoosting(X,y):
+def TreeGradientBoosting(X, y):
     model = LGBMClassifier()
     model.fit(X, y)
     return model
 
 
-def LinearRegressionModel(X,y):
+def LinearRegressionModel(X, y):
     model = LinearRegression()
     model.fit(X, y)
     return model
 
 
-def SupportVectorMachines(X,y):
+def SupportVectorMachines(X, y):
     model = SVC()
     model.fit(X, y)
     return model
 
 
-def KNN(X,y):
+def KNN(X, y):
     model = KNeighborsClassifier(n_neighbors=5)
     model.fit(X, y)
     return model
 
 
-def RandomForest(X,y):
+def RandomForest(X, y):
     model = RandomForestClassifier(max_depth=3)
     model.fit(X, y)
     return model
 
 
-def LogisticRegressionModel(X,y):
+def LogisticRegressionModel(X, y):
     model = LogisticRegression()
     model.fit(X, y)
     return model
 
 
-def DecisionTree(X,y):
+def DecisionTree(X, y):
     model = DecisionTreeClassifier()
     model.fit(X, y)
     return model
 
 
-def SupportVectorRegression(X,y):
+def SupportVectorRegression(X, y):
     model = SVR()
     model.fit(X, y)
     return model
 
-def NeuralNetworks(X,y):
+
+def NeuralNetworks(X, y):
     early_stopping = tf.keras.callbacks.EarlyStopping(
         monitor='val_loss',
         verbose=0,
@@ -76,9 +79,8 @@ def NeuralNetworks(X,y):
         mode='auto',
         restore_best_weights=True)
 
-    epochs=25
-    batch_size=16
-
+    epochs = 25
+    batch_size = 16
 
     model = Sequential()
     model.add(Conv1D(32, kernel_size=3, activation='relu', input_shape=(X.shape[1], 1)))
@@ -104,6 +106,7 @@ def NeuralNetworks(X,y):
 
     return model
 
+
 def f1(y_true, y_pred):
     true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
     possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
@@ -112,3 +115,10 @@ def f1(y_true, y_pred):
     recall = true_positives / (possible_positives + K.epsilon())
     f1_val = 2 * (precision * recall) / (precision + recall + K.epsilon())
     return f1_val
+
+def DummyModel(X,y):
+    model = DummyClassifier()
+    model.fit(X, y)
+    return model
+
+

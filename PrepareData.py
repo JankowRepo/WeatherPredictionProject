@@ -1,4 +1,5 @@
 import warnings
+
 warnings.simplefilter(action='ignore', category=FutureWarning)
 import pandas as pd
 import numpy as np
@@ -13,6 +14,7 @@ from joblib import dump, load
 
 importlib.reload(db)
 
+
 def get_data():
     # df=db.read_data('postgresql+psycopg2://postgres:admin@localhost/postgres')
     df = db.read_data('postgresql+psycopg2://postgres:adam123@localhost/postgres')
@@ -23,12 +25,11 @@ def get_data():
     df['nextday_rainfall'] = df['nextday_rainfall'].shift(-1)
     df.dropna()
 
-    y=df.nextday_rainfall
+    y = df.nextday_rainfall
     scaler = MinMaxScaler()
-    df = pd.DataFrame(scaler.fit_transform(df.iloc[:,:-1]), index=df.index, columns=df.iloc[:,:-1].columns)
+    df = pd.DataFrame(scaler.fit_transform(df.iloc[:, :-1]), index=df.index, columns=df.iloc[:, :-1].columns)
     dump(scaler, 'data_scaler.bin', compress=True)
-    df["nextday_rainfall"]=y
-
+    df["nextday_rainfall"] = y
 
     best_features = np.abs(df.corr()['nextday_rainfall']).sort_values(ascending=False) > 0.05
     best_features = best_features.where(best_features.values == True).dropna().index
@@ -38,14 +39,15 @@ def get_data():
 
 
 def standarize_row(df, columns):
-    df=choose_columns(df)
+    df = choose_columns(df)
 
     scaler = load('data_scaler.bin')
     df = pd.DataFrame(scaler.transform(df), index=df.index, columns=df.columns)
 
-    df=df[columns]
+    df = df[columns]
 
     return df
+
 
 def choose_columns(df):
     df = df[["datetime", "temp", "tempmin", "tempmax", "feelslike", "feelslikemax", "feelslikemin",
