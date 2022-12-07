@@ -13,8 +13,8 @@ importlib.reload(db)
 
 
 def get_data():
-    # df=db.read_data('postgresql+psycopg2://postgres:admin@localhost/postgres')
-    df = db.read_data('postgresql+psycopg2://postgres:adam123@localhost/postgres')
+    df = db.read_data('postgresql+psycopg2://postgres:admin@localhost/postgres')
+    #df = db.read_data('postgresql+psycopg2://postgres:adam123@localhost/postgres')
 
     df = choose_columns(df)
 
@@ -89,8 +89,5 @@ def choose_columns(df):
     df['month'] = df['datetime'].dt.month
     df['day_of_year'] = df['datetime'].dt.dayofyear
     df = df.drop(columns=['datetime'], axis=1)
-
-    df = df.dropna()
-    df = pd.DataFrame(df[(np.abs(stats.zscore(df)) < 10).all(axis=1)], columns=df.columns)
 
     return df
