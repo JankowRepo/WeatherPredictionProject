@@ -90,7 +90,4 @@ def choose_columns(df):
     df['day_of_year'] = df['datetime'].dt.dayofyear
     df = df.drop(columns=['datetime'], axis=1)
 
-    df = df.dropna()
-    df = pd.DataFrame(df[(np.abs(stats.zscore(df)) < 10).all(axis=1)], columns=df.columns)
-
     return df
