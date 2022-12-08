@@ -1,4 +1,5 @@
 import warnings
+
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 import pandas as pd
@@ -35,10 +36,45 @@ def get_data():
     return df
 
 
+def get_temp_data():
+    # df=db.read_data('postgresql+psycopg2://postgres:admin@localhost/postgres')
+    df = db.read_data('postgresql+psycopg2://postgres:adam123@localhost/postgres')
+
+    df = choose_columns(df)
+
+    df['temp'] = df['temp'].shift(-1)
+    df.dropna()
+
+    y = df.temp
+    df = df.drop('temp', axis=1)
+    scaler = MinMaxScaler()
+    df = pd.DataFrame(scaler.fit_transform(df), index=df.index, columns=df.columns)
+    dump(scaler, 'temp_data_scaler.bin', compress=True)
+    df["temp"] = y
+
+    best_features = np.abs(df.corr()['temp']).sort_values(ascending=False) > 0.05
+    best_features = best_features.where(best_features.values == True).dropna().index
+    df = df[best_features]
+
+    return df
+
+
 def standarize_row(df, columns):
     df = choose_columns(df)
 
     scaler = load('data_scaler.bin')
+    df = pd.DataFrame(scaler.transform(df), index=df.index, columns=df.columns)
+
+    df=df[columns]
+
+    return df
+
+
+def standarize_temp_row(df, columns):
+    df = choose_columns(df)
+    df = df.drop('temp', axis=1)
+
+    scaler = load('temp_data_scaler.bin')
     df = pd.DataFrame(scaler.transform(df), index=df.index, columns=df.columns)
 
     df = df[columns]
