@@ -14,8 +14,8 @@ importlib.reload(db)
 
 
 def get_data():
-    # df=db.read_data('postgresql+psycopg2://postgres:admin@localhost/postgres')
-    df = db.read_data('postgresql+psycopg2://postgres:adam123@localhost/postgres')
+    df = db.read_data('postgresql+psycopg2://postgres:admin@localhost/postgres')
+    #df = db.read_data('postgresql+psycopg2://postgres:adam123@localhost/postgres')
 
     df = choose_columns(df)
 

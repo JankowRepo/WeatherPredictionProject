@@ -1,5 +1,5 @@
 import warnings
-from pandas.core.common import SettingWithCopyWarning
+from pandas.errors import SettingWithCopyWarning
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 warnings.simplefilter(action="ignore", category=SettingWithCopyWarning)
