@@ -1,5 +1,7 @@
 import warnings
-from pandas.errors import SettingWithCopyWarning
+
+from keras.losses import msle
+from pandas.core.common import SettingWithCopyWarning
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 warnings.simplefilter(action="ignore", category=SettingWithCopyWarning)
@@ -81,26 +83,20 @@ def NeuralNetworks(X, y):
     batch_size = 16
 
     model = Sequential()
-    model.add(Conv1D(32, kernel_size=3, activation='relu', input_shape=(X.shape[1], 1)))
-    model.add(Conv1D(32, kernel_size=3, activation='relu'))
-    model.add(Flatten())
-    model.add(layers.Dropout(0.4))
 
-    model.add(Dense(64, activation="relu"))
+    model.add(Dense(64, input_shape=(X.shape[1],), activation="relu"))
     model.add(layers.Dropout(0.5))
     model.add(Dense(16, activation="relu"))
     model.add(layers.Dropout(0.4))
     model.add(Dense(4, activation="relu"))
     model.add(layers.Dropout(0.33))
-    model.add(Dense(1, activation='sigmoid'))
+    model.add(Dense(1, activation='linear'))
 
-    model.compile(loss='binary_crossentropy', optimizer=SGD(learning_rate=0.008, momentum=0.85),
+    model.compile(loss=msle, optimizer=SGD(learning_rate=0.01, momentum=0.85),
                   metrics=[f1, 'accuracy'])
 
-    X_tr, X_val, y_tr, y_val = train_test_split(X, y, test_size=0.25, stratify=y)
-
-    model.fit(X_tr, y_tr, epochs=epochs, verbose=True, batch_size=batch_size, callbacks=[early_stopping],
-              validation_data=(X_val, y_val))
+    model.fit(X, y, epochs=epochs, verbose=True, batch_size=batch_size, callbacks=[early_stopping],
+              validation_split=0.25)
 
     return model
 
@@ -114,9 +110,8 @@ def f1(y_true, y_pred):
     f1_val = 2 * (precision * recall) / (precision + recall + K.epsilon())
     return f1_val
 
-def DummyModel(X,y):
+
+def DummyModel(X, y):
     model = DummyClassifier()
     model.fit(X, y)
     return model
-
-
