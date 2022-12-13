@@ -1,0 +1,107 @@
+CREATE OR REPLACE PROCEDURE public.add_avg_temp_by_months()
+ LANGUAGE plpgsql
+AS $procedure$
+BEGIN
+CREATE TABLE avg_temp AS
+SELECT
+EXTRACT(MONTH FROM d.datetime::DATE) AS month,
+AVG(d."temp") AS avg_temperature
+FROM public."DBWeather" d
+GROUP BY month;
+END;
+$procedure$
+;
+
+
+CREATE OR REPLACE PROCEDURE public.add_min_temps()
+ LANGUAGE plpgsql
+AS $procedure$
+BEGIN
+CREATE TABLE min_temps AS select d.datetime, d.tempmin from "DBWeather" d where d.datetime like '%-12-%';
+END;
+$procedure$
+;
+
+
+CREATE OR REPLACE PROCEDURE public.create_avg_humidity_for_quarters_between_years(IN year1 integer, IN year2 integer)
+ LANGUAGE plpgsql
+AS $procedure$
+BEGIN
+CREATE TABLE avg_humidity_per_quarter AS
+SELECT
+EXTRACT(QUARTER FROM d.datetime::DATE) as quarter,
+AVG(d.humidity) as avg_humidity
+FROM public."DBWeather" d
+WHERE EXTRACT(YEAR FROM d.datetime::DATE) IN (year1, year2)
+GROUP BY quarter
+ORDER BY quarter;
+END;
+$procedure$
+;
+
+
+CREATE OR REPLACE PROCEDURE public.create_avg_temp_for_months_between_years(IN year1 integer, IN year2 integer)
+ LANGUAGE plpgsql
+AS $procedure$
+BEGIN
+CREATE TABLE avg_maxtemp AS
+SELECT
+EXTRACT(MONTH FROM d.datetime::DATE) AS month,
+AVG(d.tempmax) AS avg_maxtemp
+FROM public."DBWeather" d
+WHERE EXTRACT(YEAR FROM d.datetime::DATE) IN (year1, year2)
+GROUP BY month
+order by month;
+END;
+$procedure$
+;
+
+
+CREATE OR REPLACE PROCEDURE public.create_avg_windspeed_for_months_between_years(IN year1 integer, IN year2 integer)
+ LANGUAGE plpgsql
+AS $procedure$
+BEGIN
+CREATE TABLE avg_winspeed_for_months AS
+    SELECT 
+    EXTRACT(year FROM d.datetime::DATE)::integer AS year, EXTRACT(month FROM d.datetime::DATE)::integer AS month, 
+    AVG(d.windspeed)::float
+    FROM public."DBWeather" d
+    WHERE EXTRACT(year from d.datetime::DATE)::integer BETWEEN year1 AND year2
+    GROUP BY year, month;
+END;
+$procedure$
+;
+
+
+CREATE OR REPLACE PROCEDURE public.create_avg_windspeed_for_selected_years(IN year1 integer, IN year2 integer)
+ LANGUAGE plpgsql
+AS $procedure$
+BEGIN
+CREATE TABLE avg_windspeed_per_year AS
+SELECT
+EXTRACT(year FROM d.datetime::DATE)::integer AS year,
+AVG(d.windspeed)::float
+FROM public."DBWeather" d
+WHERE
+EXTRACT(year from d.datetime::DATE)::integer BETWEEN year1 AND year2
+GROUP BY year;
+END;
+$procedure$
+;
+
+
+CREATE OR REPLACE PROCEDURE public.create_humidity_and_windspeed_for_days_between_temp_values(IN temp1 real, IN temp2 real)
+ LANGUAGE plpgsql
+AS $procedure$
+BEGIN
+CREATE TABLE humidity_and_windspeed_for_selected_days AS
+SELECT
+d.datetime, d.humidity, d.windspeed 
+FROM public."DBWeather" d
+WHERE
+d."temp" BETWEEN temp1 AND temp2
+GROUP BY d.datetime, d.humidity, d.windspeed
+order by d.datetime;
+END;
+$procedure$
+;

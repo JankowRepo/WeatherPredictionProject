@@ -1,0 +1,116 @@
+CREATE OR REPLACE FUNCTION public.add_row(name character varying, datetime character varying, tempmax real, tempmin real, temp real, feelslikemax real, feelslikemin real, feelslike real, dew real, humidity real, precip real, precipprob integer, precipcover real, preciptype character varying, snow character varying, snowdepth integer, windgust character varying, windspeed real, winddir real, sealevelpressure real, cloudcover integer, visibility real, solarradiation character varying, solarenergy character varying, uvindex character varying, severerisk character varying, sunrise character varying, sunset character varying, moonphase double precision, conditions character varying, description character varying, icon character varying, stations character varying)
+ RETURNS void
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+INSERT INTO public."DBWeather"("name", datetime, tempmax, tempmin, "temp", feelslikemax, feelslikemin, feelslike, dew, humidity, precip, precipprob, precipcover, preciptype, snow, snowdepth, windgust, windspeed, winddir, sealevelpressure, cloudcover, visibility, solarradiation, solarenergy, uvindex, severerisk, sunrise, sunset, moonphase, conditions, description, icon, stations)
+VALUES(name, datetime, tempmax, tempmin, temp, feelslikemax, feelslikemin, feelslike, dew, humidity, precip, precipprob, precipcover, preciptype, snow, snowdepth, windgust, windspeed, winddir, sealevelpressure, cloudcover, visibility, solarradiation, solarenergy, uvindex, severerisk, sunrise, sunset, moonphase, conditions, description, icon, stations);
+END;
+$function$
+;
+
+
+CREATE OR REPLACE FUNCTION public.change_trigger()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+       BEGIN
+         IF TG_OP = 'INSERT'
+         THEN INSERT INTO public.t_history (
+                tabname, schemaname, operation, new_val
+              ) VALUES (
+                TG_RELNAME, TG_TABLE_SCHEMA, TG_OP, row_to_json(NEW)
+              );
+           RETURN NEW;
+         ELSIF  TG_OP = 'UPDATE'
+         THEN
+           INSERT INTO public.t_history (
+             tabname, schemaname, operation, new_val, old_val
+           )
+           VALUES (TG_RELNAME, TG_TABLE_SCHEMA, TG_OP, row_to_json(NEW), row_to_json(OLD));
+           RETURN NEW;
+         ELSIF TG_OP = 'DELETE'
+         THEN
+           INSERT INTO public.t_history
+             (tabname, schemaname, operation, old_val)
+             VALUES (
+               TG_RELNAME, TG_TABLE_SCHEMA, TG_OP, row_to_json(OLD)
+             );
+             RETURN OLD;
+         END IF;
+       END;
+$function$
+;
+
+
+CREATE OR REPLACE FUNCTION public.delete_row(tempmax real)
+ RETURNS void
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+DELETE FROM public."DBWeather" d  WHERE d.tempmax  = $1;
+END;
+$function$
+;
+
+
+CREATE OR REPLACE FUNCTION public.movedeleted()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+  BEGIN
+    INSERT INTO deleted_rows  VALUES((OLD).*);
+    RETURN OLD;
+  END;
+$function$
+;
+
+
+CREATE OR REPLACE FUNCTION public.total()
+ RETURNS integer
+ LANGUAGE plpgsql
+AS $function$
+	declare
+	total integer;
+	BEGIN
+	select count(*) into total from "DBWeather";
+if total > 7000
+then 
+    raise exception 'Number of rows is above 7000. % is already in table', total;
+   end if;
+	return total;
+	END;
+$function$
+;
+
+
+
+CREATE OR REPLACE FUNCTION public.update_row(today_temp real, tempmin real)
+ RETURNS void
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+  EXECUTE format('UPDATE "DBWeather" SET temp = %L WHERE tempmin = %L', today_temp, tempmin);
+END;
+$function$
+;
+
+
+
+CREATE OR REPLACE FUNCTION public.validate_function()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    today_date varchar(500);
+BEGIN
+   select new.datetime into today_date;
+   if exists(select d.datetime from "DBWeather" d where d.datetime = today_date)
+   then 
+    raise exception 'Date: % is already in table', today_date;
+   end if;
+   return new;
+END;
+$function$
+;

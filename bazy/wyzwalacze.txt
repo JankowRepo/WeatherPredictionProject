@@ -1,0 +1,18 @@
+create trigger archivedeleted before
+delete
+    on
+    public."DBWeather" for each row execute function movedeleted()
+
+create trigger log before
+insert
+    or
+delete
+    or
+update
+    on
+    public."DBWeather" for each row execute function change_trigger()
+
+create trigger insert_date before
+insert
+    on
+    public."DBWeather" for each row execute function validate_function()
